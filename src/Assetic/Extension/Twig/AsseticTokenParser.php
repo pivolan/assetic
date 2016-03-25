@@ -12,6 +12,8 @@
 namespace Assetic\Extension\Twig;
 
 use Assetic\Asset\AssetInterface;
+use Assetic\Asset\AssetReference;
+use Assetic\Asset\FileAsset;
 use Assetic\Factory\AssetFactory;
 
 class AsseticTokenParser extends \Twig_TokenParser
@@ -132,6 +134,18 @@ class AsseticTokenParser extends \Twig_TokenParser
         }
 
         $asset = $this->factory->createAsset($inputs, $filters, $attributes + array('name' => $name));
+
+        $asset = $this->factory->createAsset($inputs, $filters, $attributes + ['name' => $name]);
+        foreach ($asset as $leaf) {
+            if ($leaf instanceof AssetReference) {
+                $asset = $leaf->getAsset();
+            }
+        }
+        foreach ($asset as $leaf) {
+            if ($leaf instanceof FileAsset && $this->factory->isDebug()) {
+                $leaf->setTargetPath($leaf->getSourcePath());
+            }
+        }
 
         return $this->createBodyNode($asset, $body, $inputs, $filters, $name, $attributes, $token->getLine(), $this->getTag());
     }

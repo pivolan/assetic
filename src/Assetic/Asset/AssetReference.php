@@ -161,4 +161,12 @@ class AssetReference implements AssetInterface
 
         return $asset;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAsset()
+    {
+        return $this->asset;
+    }
 }
